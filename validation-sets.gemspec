@@ -16,11 +16,30 @@ Gem::Specification.new do |s|
     "LICENSE",
      "README.rdoc"
   ]
+  s.files = [
+    ".kick",
+     "LICENSE",
+     "README.rdoc",
+     "Rakefile",
+     "VERSION",
+     "lib/validation_sets.rb",
+     "lib/validation_sets/validation_set.rb",
+     "rails/init.rb",
+     "test/test_helper.rb",
+     "test/validation_sets/validation_set_test.rb",
+     "test/validation_sets_test.rb",
+     "validation-sets.gemspec"
+  ]
   s.homepage = %q{http://fingertips.github.com}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.5}
   s.summary = %q{A Rails plugin that adds validation sets to Active Record.}
+  s.test_files = [
+    "test/test_helper.rb",
+     "test/validation_sets/validation_set_test.rb",
+     "test/validation_sets_test.rb"
+  ]
 
   if s.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
