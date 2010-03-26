@@ -48,8 +48,6 @@ module ValidationSets
 end
 
 class ActiveRecord::Base
-  class << self
-    include ValidationSets
-  end
+  extend ValidationSets
   include ValidationSets::InstanceMethods
 end
