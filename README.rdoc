@@ -1,0 +1,73 @@
+= Validation Sets
+
+A Rails plugin to bundle validations in sets. You can turn entire sets of validations on or off on
+an instance. This allows you to use different sets of validations for various user roles in the
+application, or for different stages in the lifetime of the model.
+
+  validation_set_for(:activation) do |set|
+    set.validates_presence_of :fullname, :username, :email
+    set.validate :password_should_fit_requirements
+  end
+
+
+== The Case of the Organization
+
+Let's assume we have an organization in our application. The organization represents a company
+using the application. Administrators add these organizations, but often they don't have all the
+information about the company yet. It's up to the contact at the organization to complete it.
+
+  class Organization < ActiveRecord::Base
+    validates_presence_of :name
+    
+    validation_set_for(:contact) do |set|
+      set.validates_presence_of :address, :zipcode, :city
+    end
+  end
+
+Now we can have two controllers, one of the administrator and one for the contact. For the
+administrator we don't run any validations except on name so she can choose to fill out any
+of the field.
+
+  class Administrator::OrganizationsController < ActionController::Base
+    allow_access :administrator
+    
+    def create
+      @organization = Organization.new(params[:organization])
+      if @organization.save
+        redirect_to [:administrator, @organization]
+      else
+        render :new
+      end
+    end
+  end
+
+For the contact we turn on the extra set of validations for the contact so all the fields
+need to be filled out.
+
+  class Contact::OrganizationsController < ActionController::Base
+    allow_access(:contact) { @organization = @authenticated.organization }
+    
+    def update
+      @organization.attributes = params[:organization].slice(:address, :zipcode, :city)
+      @organization.use_validation_set(:contact)
+      if @organization.save
+        redirect_to [:contact, @organization]
+      else
+        render :edit
+      end
+    end
+  end
+
+== Important Security Note
+
+Validation sets uses an attribute on the model called <tt>_validation_set</tt> to set the active
+validation set. Through mass attribute assignment this attribute can be set by anyone from outside
+the application. YOU have to take care to either protect the attribute with <tt>attr_protected</tt> or
+<tt>attr_accessible</tt>.
+
+  attr_protected :_validation_set
+
+Another way to protect it is by slicing out the accessible params in the controller as done in the
+example above.
+
+  @organization = params[:organization].slice(:address, :zipcode, :city)
