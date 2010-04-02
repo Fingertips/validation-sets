@@ -57,17 +57,3 @@ need to be filled out.
       end
     end
   end
-
-== Important Security Note
-
-Validation sets uses an attribute on the model called <tt>_validation_set</tt> to set the active
-validation set. Through mass attribute assignment this attribute can be set by anyone from outside
-the application. YOU have to take care to either protect the attribute with <tt>attr_protected</tt> or
-<tt>attr_accessible</tt>.
-
-  attr_protected :_validation_set
-
-Another way to protect it is by slicing out the accessible params in the controller as done in the
-example above.
-
-  @organization = params[:organization].slice(:address, :zipcode, :city)
