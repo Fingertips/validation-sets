@@ -88,6 +88,13 @@ class ValidationSetsTest < ActiveSupport::TestCase
     assert account.save
   end
   
+  test "an exception is raised when trying to activate an unknown validation set" do
+    account = Account.new
+    assert_raises(ArgumentError) do
+      account.use_validation_set(:unknown)
+    end
+  end
+  
   def setup
     ValidationSetsTests::Initializer.setup_database
   end

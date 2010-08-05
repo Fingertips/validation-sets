@@ -23,6 +23,13 @@ module ValidationSets
     end
   end
   
+  # Returns true if the validation set is defined on this class
+  def validation_set_defined?(set)
+    [:save, :create, :update].any? do |on|
+      respond_to?(validation_set_method(on, set))
+    end
+  end
+  
   # Add a validation set to the model.
   #
   #   class Account < ActiveRecord::Base
@@ -50,12 +57,12 @@ module ValidationSets
   end
   
   module InstanceMethods
-    # Note that you want to protect this attribute to make sure people can't change the validation
-    # set from the form
     attr_reader :_validation_set
     
     # Set the active validation set on the model. After calling this both the global as well as
     # the validations defined in the set will run.
+    #
+    # Raises an exception when asked to use an unknown validation set.
     #
     # Example:
     #
@@ -63,7 +70,11 @@ module ValidationSets
     #   account.use_validation_set(:admin) # Turns on the :admin validation set
     #   account.use_validation_set(nil)    # Turns off all validation sets
     def use_validation_set(set)
-      @_validation_set = set
+      if self.class.validation_set_defined?(set)
+        @_validation_set = set
+      else
+        raise ArgumentError, "There is no validation set `#{set}'"
+      end
     end
   end
 end
