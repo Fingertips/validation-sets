@@ -98,7 +98,7 @@ class ValidationSetsTest < ActiveSupport::TestCase
   def assert_error(object, attribute)
     message = "Expected #{attribute} to have a validation error"
     if object.errors[:base].kind_of?(Array)
-      assert object.errors[attribute].empty?, message
+      assert !object.errors[attribute].empty?, message
     else
       assert object.errors.on(attribute), message
     end
