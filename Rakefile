@@ -5,13 +5,23 @@ require 'rake/rdoctask'
 desc 'Default: run unit tests.'
 task :default => :test
 
-desc 'Test the plugin.'
-Rake::TestTask.new(:test) do |t|
-  t.libs << 'lib'
-  t.libs << 'test'
-  t.pattern = 'test/**/*_test.rb'
-  t.verbose = true
+namespace :test do
+  Rake::TestTask.new(:rails2) do |t|
+    t.libs += %w(test test/test_helper/rails2)
+    t.pattern = 'test/**/*_test.rb'
+    t.verbose = true
+  end
+  
+  desc 'Test the plugin with Rails 3.'
+  Rake::TestTask.new(:rails3) do |t|
+    t.libs += %w(test test/test_helper/rails3)
+    t.pattern = 'test/**/*_test.rb'
+    t.verbose = true
+  end
 end
+
+desc 'Run all tests'
+task :test => ['test:rails2', 'test:rails3']
 
 desc 'Generate documentation'
 Rake::RDocTask.new(:rdoc) do |rdoc|

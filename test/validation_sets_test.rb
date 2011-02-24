@@ -1,4 +1,4 @@
-require File.expand_path('../test_helper', __FILE__)
+require 'test_helper'
 
 class Account < ActiveRecord::Base
   attr_accessor :current_password
@@ -47,7 +47,7 @@ class ValidationSetsTest < ActiveSupport::TestCase
   test "global validation should always run" do
     account = Account.new
     assert !account.valid?
-    assert account.errors.on(:fullname)
+    assert_error(account, :fullname)
     
     account.fullname = "Patricia Herder"
     assert account.valid?
@@ -58,9 +58,9 @@ class ValidationSetsTest < ActiveSupport::TestCase
     account = Account.new
     account.use_validation_set(:activation)
     assert !account.valid?
-    assert account.errors.on(:email)
-    assert account.errors.on(:username)
-    assert account.errors.on(:password)
+    assert_error(account, :email)
+    assert_error(account, :username)
+    assert_error(account, :password)
     
     account.fullname = "Patricia Herder"
     account.email = 'patricia@example.com'
@@ -74,8 +74,8 @@ class ValidationSetsTest < ActiveSupport::TestCase
     account = Account.new
     account.use_validation_set(:admin)
     assert !account.valid?
-    assert account.errors.on(:fullname)
-    assert account.errors.on(:email)
+    assert_error(account, :fullname)
+    assert_error(account, :email)
     
     account.fullname = "Patricia Herder"
     account.email = 'patricia@example.com'
@@ -92,6 +92,15 @@ class ValidationSetsTest < ActiveSupport::TestCase
     account = Account.new
     assert_raises(ArgumentError) do
       account.use_validation_set(:unknown)
+    end
+  end
+  
+  def assert_error(object, attribute)
+    message = "Expected #{attribute} to have a validation error"
+    if object.errors[:base].kind_of?(Array)
+      assert object.errors[attribute].empty?, message
+    else
+      assert object.errors.on(attribute), message
     end
   end
   
